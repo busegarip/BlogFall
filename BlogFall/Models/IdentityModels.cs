@@ -9,7 +9,7 @@ using Microsoft.AspNet.Identity.EntityFramework;
 namespace BlogFall.Models
 {
     // You can add profile data for the user by adding more properties to your ApplicationUser class, please visit https://go.microsoft.com/fwlink/?LinkID=317594 to learn more.
-    public class ApplicationUser : IdentityUser
+    public class ApplicationUser : IdentityUser//application user kullanıcı classına eşdeğer, identity senin için kulanıcı classı oluşturmak için miras aldık. bunlara ek propertyler ekleyebiliriz ad soyad gibi
     {
         public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<ApplicationUser> manager)
         {
@@ -23,10 +23,10 @@ namespace BlogFall.Models
 
     }
 
-    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>//application user identityden miras alır ekstra kendi tablolarımızı ekleyebiliriz.
     {
         public ApplicationDbContext()
-            : base("DefaultConnection", throwIfV1Schema: false)
+            : base("name=ApplicationDbContext", throwIfV1Schema: false)
         {
         }
 
@@ -37,7 +37,9 @@ namespace BlogFall.Models
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
-            modelBuilder.Conventions.Remove<OneToManyCascadeDeleteConvention>();
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Conventions.Remove<OneToManyCascadeDeleteConvention>();//cascade delete kaldırıyoruz bbu default olarak açık bağlı tablolar için bire çok ilişkilerde otomatik silme özelliğini koyma
         }
 
         public DbSet<Category> Categories { get; set; }
