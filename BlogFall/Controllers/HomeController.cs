@@ -31,6 +31,8 @@ namespace BlogFall.Controllers
                 result = result.Where(x => x.CategoryId == cid);//Filtrelediğimizi yolladık.
             }
 
+            ViewBag.page = page;
+            ViewBag.pageCount = Math.Ceiling(result.Count() / (decimal)pageSize);
             ViewBag.nextPage = page + 1;
             ViewBag.prevPage = page - 1;
             ViewBag.cid = cid;
