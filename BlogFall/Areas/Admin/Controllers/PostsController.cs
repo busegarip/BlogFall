@@ -36,7 +36,7 @@ namespace BlogFall.Areas.Admin.Controllers
                 CategoryId=x.CategoryId,
                 Content=x.Content,
                 Title=x.Title
-            }).FirstOrDefault();
+            }).FirstOrDefault(x=>x.Id==id);
 
             return View(vm);
         }

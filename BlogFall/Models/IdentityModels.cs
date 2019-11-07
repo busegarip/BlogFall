@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Data.Entity;
 using System.Data.Entity.ModelConfiguration.Conventions;
 using System.Security.Claims;
@@ -18,6 +19,9 @@ namespace BlogFall.Models
             // Add custom user claims here
             return userIdentity;
         }
+
+        [StringLength(100)]
+        public string Photo { get; set; }
 
         public virtual ICollection<Post> Posts { get; set; }//bir yazarın yazıları olabilir
 

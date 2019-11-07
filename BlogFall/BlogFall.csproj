@@ -1825,6 +1825,7 @@
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
+    <Content Include="Images\avatar.png" />
     <Content Include="Scripts\bootstrap.bundle.js" />
     <Content Include="Scripts\bootstrap.bundle.min.js" />
     <Content Include="Scripts\bootstrap.js" />
@@ -2024,11 +2025,14 @@
     <Content Include="webfonts\fa-brands-400.ttf" />
     <Content Include="webfonts\fa-brands-400.eot" />
     <Content Include="Views\Home\_CategoriesPartial.cshtml" />
+    <Content Include="Views\Manage\UploadAvatar.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Areas\Admin\Models\" />
     <Folder Include="Areas\Admin\Views\AdminBase\" />
+    <Folder Include="Upload\Posts\" />
+    <Folder Include="Upload\Profiles\" />
     <Folder Include="Views\Base\" />
   </ItemGroup>
   <ItemGroup>
