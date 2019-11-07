@@ -7,11 +7,13 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using BlogFall.Models;
+using BlogFall.ViewModels;
+using System.IO;
 
 namespace BlogFall.Controllers
 {
     [Authorize]
-    public class ManageController : Controller
+    public class ManageController : BaseController
     {
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
@@ -32,9 +34,9 @@ namespace BlogFall.Controllers
             {
                 return _signInManager ?? HttpContext.GetOwinContext().Get<ApplicationSignInManager>();
             }
-            private set 
-            { 
-                _signInManager = value; 
+            private set
+            {
+                _signInManager = value;
             }
         }
 
@@ -336,12 +338,47 @@ namespace BlogFall.Controllers
             base.Dispose(disposing);
         }
 
-        public ActionResult UploadAvatar(HttpPostedFileBase file)
+        public ActionResult UploadAvatar()
         {
-            return View();
+            var user = UserManager.FindById(User.Identity.GetUserId());
+            var vm = new UploadAvatarViewModel
+            {
+                Photo = user.Photo
+            };
+            return View(vm);
         }
 
-#region Helpers
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult UploadAvatar(UploadAvatarViewModel vm)
+        {
+            var user = db.Users.Find(User.Identity.GetUserId());
+            if (ModelState.IsValid)
+            {
+                var saveFolderPath = Server.MapPath("~/Upload/Profiles");
+                var ext = Path.GetExtension(vm.File.FileName);
+                var saveFileName = Guid.NewGuid().ToString() + ext;
+                var saveFilePath = Path.Combine(saveFolderPath,saveFileName);
+                #region Eski Dosyayı Sil (varsa)
+                string deleteFilePath = null;
+                if (!string.IsNullOrEmpty(user.Photo))
+                {
+                    deleteFilePath = Path.Combine(saveFolderPath, user.Photo);
+                    System.IO.File.Delete(deleteFilePath);
+                } 
+                #endregion
+
+                vm.File.SaveAs(saveFilePath);//yolunu buluyor.
+                user.Photo = saveFileName;
+                db.SaveChanges();
+                return RedirectToAction("Index");
+            }
+
+            vm.Photo = user.Photo;
+            return View(vm);
+        }
+
+        #region Helpers
         // Used for XSRF protection when adding external logins
         private const string XsrfKey = "XsrfId";
 
@@ -392,6 +429,6 @@ namespace BlogFall.Controllers
             Error
         }
 
-#endregion
+        #endregion
     }
 }
