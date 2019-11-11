@@ -1,13 +1,21 @@
-﻿@model List<Post>
+﻿@model List<Category>
 @{
-    ViewBag.Title = "Index";
-    ViewBag.HeaderTitle = "Yazılar";
+    ViewBag.Title = "Kategoriler";
+    ViewBag.HeaderTitle = "Kategoriler";
 }
+
+@*@if (TempData["successMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["successMessage"]
+    </div>
+}*@
+
 <div class="card">
     <div class="card-header">
-        <a href="@Url.Action("New", "Posts")" class="btn btn-sm btn-primary">
+        <a href="@Url.Action("New", "Categories")" class="btn btn-sm btn-primary">
             <i class="fas fa-plus"></i>
-            Yeni Yazı
+            Yeni Kategori
         </a>
     </div>
     <!-- /.card-header -->
@@ -16,27 +24,21 @@
             <thead>
                 <tr>
                     <th>#</th>
-                    <th>Başlık</th>
-                    <th>Kategori</th>
-                    <th>Yazar</th>
-                    <th>Zaman</th>
+                    <th>Kategori Adı</th>
                     <th>İşlemler</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach (var item in Model)
                 {
-                    <tr data-post-id="@item.Id">
+                    <tr data-category-id="@item.Id">
                         <td>@item.Id</td>
-                        <td>@item.Title</td>
-                        <td>@item.Category.CategoryName</td>
-                        <td>@item.Author.UserName</td>
-                        <td>@item.CreationTime</td>
+                        <td>@item.CategoryName</td>
                         <td>
-                            <a href="@Url.Action("Edit", "Posts", new { id = item.Id})" class="btn btn-info">
+                            <a href="@Url.Action("Edit", "Categories", new { id = item.Id})" class="btn btn-info">
                                 Düzenle
                             </a>
-                            <a href="#" class="btn btn-danger" data-toggle="modal" data-target="#exampleModal" data-post-title="@item.Title" data-post-id="@item.Id">
+                            <a href="#" class="btn btn-danger" data-toggle="modal" data-target="#exampleModal" data-category-name="@item.CategoryName" data-category-id="@item.Id">
                                 Sil
                             </a>
                         </td>
@@ -46,10 +48,7 @@
             <tfoot>
                 <tr>
                     <th>#</th>
-                    <th>Başlık</th>
-                    <th>Kategori</th>
-                    <th>Yazar</th>
-                    <th>Zaman</th>
+                    <th>Kategori Adı</th>
                     <th>İşlemler</th>
                 </tr>
             </tfoot>
@@ -69,8 +68,8 @@
                 </button>
             </div>
             <div class="modal-body">
-                <input type="hidden" id="modalPostId" />
-                "<span id="modalPostTitle">Falanca</span>" başlıklı yazıyı silmek isteğinize emin misiniz?
+                <input type="hidden" id="modalCategoryId" />
+                "<span id="modalCategoryName">Falanca</span>" isimli kategoriyi silmek isteğinize emin misiniz?
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Vazgeç</button>
@@ -83,36 +82,51 @@
 @section scripts
 {
     <script>
-    $(function () {
-        var table = $("#example1").DataTable({
-            order:[[4,"desc"]],
+        $(function () {
+
+            @if (TempData["successMessage"] != null)
+            {
+                <text>toastr.success("@TempData["successMessage"]");</text>
+            }
+
+
+
+var table = $("#example1").DataTable({
+order:[[1,"asc"]],
             language: {
                 url: "@Url.Content("~/Areas/Admin/plugins/datatables/Turkish.json")" /*layouta sürükleyerek kullanılmıyormuş bu yüzden bu şekilde kullandık türkçeleştirdik*/
             }
-        });
+            });
 
         //sil modalı gözükürken tetiklenen event
         $("#exampleModal").on("show.bs.modal", function (event) {
             var btnSil = $(event.relatedTarget);
             var modal = $(this);
 
-            $("#modalPostId").val(btnSil.data("post-id"));
-            $("#modalPostTitle").text(btnSil.data("post-title"));
+            $("#modalCategoryId").val(btnSil.data("category-id"));
+            $("#modalCategoryName").text(btnSil.data("category-name"));
         });
 
         $("#modalButtonDelete").click(function () {
-            var id = $("#modalPostId").val();
+            var id = $("#modalCategoryId").val();
 
             $.ajax({
-                url: "@Url.Action("Delete", "Posts")",
+                url: "@Url.Action("Delete", "Categories")",
                 type: "POST",
                 data: { id: id },
                 success: function (result) {
-                    //tablodan ilgili satırı kaldır
-                    var tr = $("tr[data-post-id=" + id + "]");
-                    table.row(tr).remove().draw(false);
-
-                    $("#exampleModal").modal("hide");
+                    if (result.success) {
+                        //tablodan ilgili satırı kaldır
+                        var tr = $("tr[data-category-id=" + id + "]");
+                        table.row(tr).remove().draw(false);
+                        $("#exampleModal").modal("hide");
+                    }
+                    else {
+                        alert(result.error);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    alert(error);
                 }
             });
         });
@@ -120,4 +134,6 @@
     });
     </script>
 }
+
+
 
