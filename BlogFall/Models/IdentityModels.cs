@@ -25,6 +25,8 @@ namespace BlogFall.Models
 
         public virtual ICollection<Post> Posts { get; set; }//bir yazarın yazıları olabilir
 
+        public virtual ICollection<Comment> Comments { get; set; }
+
     }
 
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>//application user identityden miras alır ekstra kendi tablolarımızı ekleyebiliriz.
@@ -48,5 +50,6 @@ namespace BlogFall.Models
 
         public DbSet<Category> Categories { get; set; }
         public DbSet<Post> Posts { get; set; }
+        public DbSet<Comment> Comments { get; set; }
     }
 }

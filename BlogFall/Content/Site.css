@@ -1,20 +1,4 @@
-﻿body {
-    padding-top: 50px;
-    padding-bottom: 20px;
-}
-
-/* Set padding to keep content from hitting the edges */
-.body-content {
-    padding-left: 15px;
-    padding-right: 15px;
-}
-
-/* Override the default bootstrap behavior where horizontal description lists 
-   will truncate terms that are too long to fit in the left column 
-*/
-.dl-horizontal dt {
-    white-space: normal;
-}
+﻿
 /* stylelint-disable selector-list-comma-newline-after */
 
 .blog-header {
@@ -127,7 +111,6 @@ h1, h2, h3, h4, h5, h6 {
     margin-bottom: 4rem;
 }
 
-
 .blog-post-title {
     margin-bottom: .25rem;
     font-size: 2.5rem;
@@ -137,6 +120,7 @@ h1, h2, h3, h4, h5, h6 {
     margin-bottom: 1.25rem;
     color: #999;
 }
+
 .blog-post img {
     max-width: 100%;
 }
@@ -155,12 +139,7 @@ h1, h2, h3, h4, h5, h6 {
     .blog-footer p:last-child {
         margin-bottom: 0;
     }
-/* Set width on the form input elements since they're 100% wide by default */
-input,
-select,
-textarea {
-    max-width: 280px;
-}
+
 .bd-placeholder-img {
     font-size: 1.125rem;
     text-anchor: middle;
@@ -170,9 +149,8 @@ textarea {
     user-select: none;
 }
 
-@media (min-width: 768px) {
+@@media (min-width: 768px) {
     .bd-placeholder-img-lg {
         font-size: 3.5rem;
     }
 }
-
