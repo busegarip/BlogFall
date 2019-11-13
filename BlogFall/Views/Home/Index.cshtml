@@ -11,20 +11,27 @@
 {
     <div class="blog-post">
         <h2 class="blog-post-title">
-            <a href="@Url.Action("Showpost", "Home", new { id=item.Id})" class="text-reset test-decoration-none" >
+            <a href="@Url.Action("ShowPost", "Home", new { id=item.Id})" class="text-reset test-decoration-none">
                 @item.Title
             </a>
         </h2>
-        <p class="blog-post-meta">@item.CreationTime <a href="#">@item.Author.UserName</a></p>
-
-        @Html.ShowPostIntro(item.Content)
-
-        <p class="text-right">
-            <a href="@Url.Action("ShowPost", "Home", new { id=item.Id})">
-                Devamını oku..
+        <p class="blog-post-meta">
+            @item.CreationTime
+            <a href="#">@item.Author.UserName</a>
+            <a href="@Url.Action("ShowPost", "Home", new { id=item.Id})#comments">
+                @item.Comments.Count Yorum
             </a>
+            
         </p>
-    </div><!-- /.blog-post -->
+
+    @Html.ShowPostIntro(item.Content)
+
+    <p class="text-right">
+        <a href="@Url.Action("ShowPost", "Home", new { id=item.Id})">
+            Devamını oku..
+        </a>
+    </p>
+</div><!-- /.blog-post -->
 }
 
 <nav class="blog-pagination">

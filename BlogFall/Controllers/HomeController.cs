@@ -1,4 +1,6 @@
 ﻿using BlogFall.Models;
+using BlogFall.ViewModels;
+using Microsoft.AspNet.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -72,6 +74,33 @@ namespace BlogFall.Controllers
             }
 
             return View(post);
+        }
+
+        [HttpPost, ValidateAntiForgeryToken]
+        public ActionResult SendComment(SendCommentViewModel model)
+        {
+            if (ModelState.IsValid)//veriler hatasız gemnişse
+            {
+                Comment comment = new Comment
+                {
+                    AuthorId = User.Identity.GetUserId(),
+                    AuthorName=model.AuthorName,
+                    AuthorEmail= model.AuthorEmail,
+                    Content=model.Content,
+                    CreationTime=DateTime.Now,
+                    ParentId=model.ParentId,
+                    PostId=model.PostId
+                };
+                db.Comments.Add(comment);
+                db.SaveChanges();
+
+                return Json(comment);//ajax metoduyla kullanıcıya geri döndürüyoruz yorum yapmak için
+            }
+            var errorList = ModelState.Values.SelectMany(m => m.Errors)//model state deki hata mesajlaını toptan vermeye yarar
+                .Select(e => e.ErrorMessage)
+                .ToList();
+
+            return Json(new { Errors=errorList});
         }
     }
 }

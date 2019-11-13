@@ -23,6 +23,7 @@ namespace BlogFall
             bundles.Add(new StyleBundle("~/Content/css").Include(
                       "~/Content/bootstrap.css",
                       "~/Content/fontawesome-all.css",
+                      "~/Content/toastr.css",
                       "~/Content/site.css"));
 
             //cdn üzerinden yapmak daha iyi bir yöntem bu aşağıdaki kod olmadan cdn deki kullanılamıyor
