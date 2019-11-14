@@ -89,7 +89,7 @@ namespace BlogFall
     }
 
     // Configure the application sign-in manager which is used in this application.
-    public class ApplicationSignInManager : SignInManager<ApplicationUser, string>
+    public class ApplicationSignInManager : SignInManager<ApplicationUser, string>//giriş yöneticisi identity bizim için oluşturuyor
     {
         public ApplicationSignInManager(ApplicationUserManager userManager, IAuthenticationManager authenticationManager)
             : base(userManager, authenticationManager)
@@ -104,6 +104,18 @@ namespace BlogFall
         public static ApplicationSignInManager Create(IdentityFactoryOptions<ApplicationSignInManager> options, IOwinContext context)
         {
             return new ApplicationSignInManager(context.GetUserManager<ApplicationUserManager>(), context.Authentication);
+        }
+
+        public override Task<SignInStatus> PasswordSignInAsync(string userName, string password, bool isPersistent, bool shouldLockout)//aktif olup olmadığına giriş yapılabilir mi diye bakıcaz
+        {
+            var user = UserManager.FindByName(userName);
+
+            if (user != null && !user.IsEnabled)
+            {
+                return Task.FromResult(SignInStatus.LockedOut);//varsın ama kitlisin parolya bakmadan
+            }
+
+            return base.PasswordSignInAsync(userName, password, isPersistent, shouldLockout);
         }
     }
 }
