@@ -1,6 +1,7 @@
 namespace BlogFall.Migrations
 {
     using BlogFall.Models;
+    using BlogFall.Utility;
     using Microsoft.AspNet.Identity;
     using Microsoft.AspNet.Identity.EntityFramework;
     using System;
@@ -18,52 +19,61 @@ namespace BlogFall.Migrations
 
         protected override void Seed(BlogFall.Models.ApplicationDbContext context)
         {
-            //foreach (var item in context.Users)  //var olan kullanýcýlarý aktif yapmak için çünkü þu an null durumundalardý
+            var autoGenerateSlugs = false;//kategori yazý slug oluþtursun mu?
+            var autoGenerateSlugsAll = false;// sluglarý olanlarý da dahil et
+
+            #region Admin rolünü ve kullanýcýsýný oluþtur
+            //foreach (var item in context.Users) //Bunu bi seferlik yaptýk tüm kullanýcýlar aktif oldu.
             //{
             //    item.IsEnabled = true;
             //}
             //return;
-            #region Admin rolünü ve kullanýcýsýný oluþtur
             if (!context.Roles.Any(r => r.Name == "Admin"))
             {
-                var store = new RoleStore<IdentityRole>(context);//veritabaný ile olan iliþkiyi saðlar bu yüzden önce bu tanýmlanýr arka planda bu kullanýlýr
-                var manager = new RoleManager<IdentityRole>(store);//rolleri üretmede bulmada kullanýlýyor
-                var role = new IdentityRole { Name = "Admin" };//roller tablosunun entity karþýlðý
+                var store = new RoleStore<IdentityRole>(context);//Veritabani ile iliþkiyi saðlýyor.Bir managerin kendine veriði komutlarý uyguluyo.
+                var manager = new RoleManager<IdentityRole>(store);//rolemanager class rolleri bulmada ve kullanmada iþimize yariyo.Arka planda storu kullanýyo.
+                var role = new IdentityRole { Name = "Admin" };
 
                 manager.Create(role);
             }
 
-            if (!context.Users.Any(u => u.UserName == "busegarip96@gmail.com"))
+            if (!context.Users.Any(u => u.UserName == "ozknlimedine@gmail.com"))
             {
                 var store = new UserStore<ApplicationUser>(context);
                 var manager = new UserManager<ApplicationUser>(store);
                 var user = new ApplicationUser
                 {
-                    UserName = "busegarip96@gmail.com",
-                    Email = "busegarip96@gmail.com"
-                };
+                    UserName = "ozknlimedine@gmail.com",
+                    Email = "ozknlimedine@gmail.com"
+                };//eðer yoksa bu kiþiyi oluþtur diyoruz.
 
-                manager.Create(user, "Ankara1.");//bu parola ile oluþtur.
-                manager.AddToRole(user.Id, "Admin");//bu idli kiþiyi admin rolüne atýyorum.
+                manager.Create(user, "Ankara1.");
+                manager.AddToRole(user.Id, "Admin");//Admin olarak ekledik.
 
-                //oluþturulan bu kullanýcýya ait yazýlar ekleyelim.
-                #region Kategoriler ve Yazýlar
-                if (!context.Categories.Any())//hiç kategori yoksa
+                #region Kategoriler ve yazýlar
+                if (!context.Categories.Any())
                 {
                     Category cat1 = new Category
                     {
                         CategoryName = "Gezi Yazýlarý"
-                    };//gezi yazýlarý
-                    //https://stackoverflow.com/questions/19280527/mvc-5-seed-users-and-roles
-                    cat1.Posts = new List<Post>();//hashset daha uygun bir kez girilen bir daha girilemiyor
+                    };
+                    cat1.Posts = new List<Post>();//Hashset te olur eðer öyle olursa olaný tekrar ekleyemeyiz.
                     cat1.Posts.Add(new Post
                     {
+                        //Category id yazmadýk çünkü kendi yuklarda oluþtururken belirtiyo ve kendi altýna ekliyor.
                         Title = "Gezi Yazýsý 1",
                         AuthorId = user.Id,
-                        Content = @"
-<p>Tincidunt integer eu augue augue nunc elit dolor, luctus placerat scelerisque euismod, iaculis eu lacus nunc mi elit, vehicula ut laoreet ac, aliquam sit amet justo nunc tempor, metus vel.</p>
-<p>Placerat suscipit, orci nisl iaculis eros, a tincidunt nisi odio eget lorem nulla condimentum tempor mattis ut vitae feugiat augue cras ut metus a risus iaculis scelerisque eu ac ante.</p>
-<p>Fusce non varius purus aenean nec magna felis fusce vestibulum velit mollis odio sollicitudin lacinia aliquam posuere, sapien elementum lobortis tincidunt, turpis dui ornare nisl, sollicitudin interdum turpis nunc eget.</p>",
+                        Content = @"<p>
+    Ut fusce varius nisl ac ipsum gravida vel pretium tellus tincidunt integer eu augue augue nunc elit dolor, luctus placerat.
+    Tincidunt integer eu augue augue nunc elit dolor, luctus placerat scelerisque euismod, iaculis eu lacus nunc mi elit, vehicula ut laoreet ac, aliquam sit amet justo nunc tempor, metus vel.
+</p>
+
+<p>
+    Tincidunt integer eu augue augue nunc elit dolor, luctus placerat scelerisque euismod, iaculis eu lacus nunc mi elit, vehicula ut laoreet ac, aliquam sit amet justo nunc tempor, metus vel.
+</p>
+<p>
+    Scelerisque euismod, iaculis eu lacus nunc mi elit, vehicula ut laoreet ac, aliquam sit amet justo nunc tempor, metus vel placerat suscipit, orci nisl iaculis eros, a tincidunt nisi odio eget lorem nulla condimentum tempor mattis ut vitae feugiat augue.
+</p>",
                         CreationTime = DateTime.Now
                     });
 
@@ -71,27 +81,40 @@ namespace BlogFall.Migrations
                     {
                         Title = "Gezi Yazýsý 2",
                         AuthorId = user.Id,
-                        Content = @"
-<p>Tincidunt integer eu augue augue nunc elit dolor, luctus placerat scelerisque euismod, iaculis eu lacus nunc mi elit, vehicula ut laoreet ac, aliquam sit amet justo nunc tempor, metus vel.</p>
-<p>Placerat suscipit, orci nisl iaculis eros, a tincidunt nisi odio eget lorem nulla condimentum tempor mattis ut vitae feugiat augue cras ut metus a risus iaculis scelerisque eu ac ante.</p>
-<p>Fusce non varius purus aenean nec magna felis fusce vestibulum velit mollis odio sollicitudin lacinia aliquam posuere, sapien elementum lobortis tincidunt, turpis dui ornare nisl, sollicitudin interdum turpis nunc eget.</p>",
+                        Content = @"<p>
+    Ut fusce varius nisl ac ipsum gravida vel pretium tellus tincidunt integer eu augue augue nunc elit dolor, luctus placerat.
+    Tincidunt integer eu augue augue nunc elit dolor, luctus placerat scelerisque euismod, iaculis eu lacus nunc mi elit, vehicula ut laoreet ac, aliquam sit amet justo nunc tempor, metus vel.
+</p>
+
+<p>
+    Tincidunt integer eu augue augue nunc elit dolor, luctus placerat scelerisque euismod, iaculis eu lacus nunc mi elit, vehicula ut laoreet ac, aliquam sit amet justo nunc tempor, metus vel.
+</p>
+<p>
+    Scelerisque euismod, iaculis eu lacus nunc mi elit, vehicula ut laoreet ac, aliquam sit amet justo nunc tempor, metus vel placerat suscipit, orci nisl iaculis eros, a tincidunt nisi odio eget lorem nulla condimentum tempor mattis ut vitae feugiat augue.
+</p>",
                         CreationTime = DateTime.Now
                     });
 
                     Category cat2 = new Category
                     {
                         CategoryName = "Ýþ Yazýlarý"
-                    };//iþ yazýlarý
-                    //https://stackoverflow.com/questions/19280527/mvc-5-seed-users-and-roles
+                    };
                     cat2.Posts = new List<Post>();
                     cat2.Posts.Add(new Post
                     {
                         Title = "Ýþ Yazýsý 1",
                         AuthorId = user.Id,
-                        Content = @"
-<p>Tincidunt integer eu augue augue nunc elit dolor, luctus placerat scelerisque euismod, iaculis eu lacus nunc mi elit, vehicula ut laoreet ac, aliquam sit amet justo nunc tempor, metus vel.</p>
-<p>Placerat suscipit, orci nisl iaculis eros, a tincidunt nisi odio eget lorem nulla condimentum tempor mattis ut vitae feugiat augue cras ut metus a risus iaculis scelerisque eu ac ante.</p>
-<p>Fusce non varius purus aenean nec magna felis fusce vestibulum velit mollis odio sollicitudin lacinia aliquam posuere, sapien elementum lobortis tincidunt, turpis dui ornare nisl, sollicitudin interdum turpis nunc eget.</p>",
+                        Content = @"<p>
+    Ut fusce varius nisl ac ipsum gravida vel pretium tellus tincidunt integer eu augue augue nunc elit dolor, luctus placerat.
+    Tincidunt integer eu augue augue nunc elit dolor, luctus placerat scelerisque euismod, iaculis eu lacus nunc mi elit, vehicula ut laoreet ac, aliquam sit amet justo nunc tempor, metus vel.
+</p>
+
+<p>
+    Tincidunt integer eu augue augue nunc elit dolor, luctus placerat scelerisque euismod, iaculis eu lacus nunc mi elit, vehicula ut laoreet ac, aliquam sit amet justo nunc tempor, metus vel.
+</p>
+<p>
+    Scelerisque euismod, iaculis eu lacus nunc mi elit, vehicula ut laoreet ac, aliquam sit amet justo nunc tempor, metus vel placerat suscipit, orci nisl iaculis eros, a tincidunt nisi odio eget lorem nulla condimentum tempor mattis ut vitae feugiat augue.
+</p>",
                         CreationTime = DateTime.Now
                     });
 
@@ -99,26 +122,32 @@ namespace BlogFall.Migrations
                     {
                         Title = "Ýþ Yazýsý 2",
                         AuthorId = user.Id,
-                        Content = @"
-<p>Tincidunt integer eu augue augue nunc elit dolor, luctus placerat scelerisque euismod, iaculis eu lacus nunc mi elit, vehicula ut laoreet ac, aliquam sit amet justo nunc tempor, metus vel.</p>
-<p>Placerat suscipit, orci nisl iaculis eros, a tincidunt nisi odio eget lorem nulla condimentum tempor mattis ut vitae feugiat augue cras ut metus a risus iaculis scelerisque eu ac ante.</p>
-<p>Fusce non varius purus aenean nec magna felis fusce vestibulum velit mollis odio sollicitudin lacinia aliquam posuere, sapien elementum lobortis tincidunt, turpis dui ornare nisl, sollicitudin interdum turpis nunc eget.</p>",
+                        Content = @"<p>
+    Ut fusce varius nisl ac ipsum gravida vel pretium tellus tincidunt integer eu augue augue nunc elit dolor, luctus placerat.
+    Tincidunt integer eu augue augue nunc elit dolor, luctus placerat scelerisque euismod, iaculis eu lacus nunc mi elit, vehicula ut laoreet ac, aliquam sit amet justo nunc tempor, metus vel.
+</p>
+
+<p>
+    Tincidunt integer eu augue augue nunc elit dolor, luctus placerat scelerisque euismod, iaculis eu lacus nunc mi elit, vehicula ut laoreet ac, aliquam sit amet justo nunc tempor, metus vel.
+</p>
+<p>
+    Scelerisque euismod, iaculis eu lacus nunc mi elit, vehicula ut laoreet ac, aliquam sit amet justo nunc tempor, metus vel placerat suscipit, orci nisl iaculis eros, a tincidunt nisi odio eget lorem nulla condimentum tempor mattis ut vitae feugiat augue.
+</p>",
                         CreationTime = DateTime.Now
                     });
-
                     context.Categories.Add(cat1);
                     context.Categories.Add(cat2);
                 }
-
                 #endregion
+
             }
-            #endregion
+
+            #endregion//ctrl+k+s
 
             #region Admin kullanýcýsýna 77 yeni yazý ekle
-            if (!context.Categories.Any(x => x.CategoryName == "Diðer"))
+            if (!context.Categories.Any(x => x.CategoryName == "Diðer"))//ilk boþ olduðunda gircek bidaha girmeyecek.
             {
-                ApplicationUser admin = context.Users.Where(x => x.UserName == "busegarip96@gmail.com").FirstOrDefault();
-
+                ApplicationUser admin = context.Users.Where(x => x.UserName == "ozknlimedine@gmail.com").FirstOrDefault();
                 if (admin != null)
                 {
                     if (!context.Categories.Any(x => x.CategoryName == "Diðer"))
@@ -126,27 +155,54 @@ namespace BlogFall.Migrations
                         Category diger = new Category
                         {
                             CategoryName = "Diðer",
-                            Posts = new HashSet<Post>()//ayný objeyi bir daha ekleyememeye yarar tekrarlanmaz
+                            Posts = new HashSet<Post>()
                         };
                         for (int i = 1; i <= 77; i++)
                         {
                             diger.Posts.Add(new Post
                             {
-                                Title = "Diðer Yazý " + i,
+                                //Category id yazmadýk çünkü kendi yuklarda oluþtururken belirtiyo ve kendi altýna ekliyor.
+                                Title = "Diger Yazý " + i,
                                 AuthorId = admin.Id,
-                                Content = @"
-<p>Tincidunt integer eu augue augue nunc elit dolor, luctus placerat scelerisque euismod, iaculis eu lacus nunc mi elit, vehicula ut laoreet ac, aliquam sit amet justo nunc tempor, metus vel.</p>
-",
+                                Content = @"<p>
+    Ut fusce varius nisl ac ipsum gravida vel pretium tellus tincidunt integer eu augue augue nunc elit dolor, luctus placerat.
+    Tincidunt integer eu augue augue nunc elit dolor, luctus placerat scelerisque euismod, iaculis eu lacus nunc mi elit, vehicula ut laoreet ac, aliquam sit amet justo nunc tempor, metus vel.
+</p>
+<p>
+    Scelerisque euismod, iaculis eu lacus nunc mi elit, vehicula ut laoreet ac, aliquam sit amet justo nunc tempor, metus vel placerat suscipit, orci nisl iaculis eros, a tincidunt nisi odio eget lorem nulla condimentum tempor mattis ut vitae feugiat augue.
+</p>",
                                 CreationTime = DateTime.Now.AddMinutes(i)
                             });
                         }
                         context.Categories.Add(diger);
+
                     }
                 }
             }
-        }
+            #endregion
 
-        #endregion
+            #region Mevcut kategori ve yazýlarýn slug'larýný oluþtur.
+            if (autoGenerateSlugs)
+            {
+                foreach (var item in context.Categories)
+                {
+                    if (true || string.IsNullOrEmpty(item.Slug))// slag yoksa
+                    {
+                        item.Slug = UrlService.URLFriendly(item.CategoryName);
+                    }
+                }
+
+                foreach (var item in context.Posts)
+                {
+                    if (true || string.IsNullOrEmpty(item.Slug))// slag yoksa
+                    {
+                        item.Slug = UrlService.URLFriendly(item.Title);
+                    }
+                }
+            }
+            
+            #endregion
+
+        }
     }
 }
-

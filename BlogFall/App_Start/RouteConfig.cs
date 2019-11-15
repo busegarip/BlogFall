@@ -14,9 +14,29 @@ namespace BlogFall
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
 
             routes.MapRoute(
+                name: "CategoryRoute",
+                url: "c/{cid}/{slug}",
+                defaults: new { controller = "Home", action = "Index", slug = UrlParameter.Optional },
+                constraints:new { cid="\\d+"}//sadece sayı gelirse bu route aktif olacak
+            );
+
+            routes.MapRoute(
+                name: "PostRoute",
+                url: "p/{id}/{slug}",
+                defaults: new { controller = "Home", action = "ShowPost", slug = UrlParameter.Optional },
+                constraints: new { id = "\\d+"}//sadece sayı gelirse bu route aktif olacak
+            );
+
+            routes.MapRoute(
                 name: "Default",
                 url: "{controller}/{action}/{id}",
                 defaults: new { controller = "Home", action = "Index", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
+                name: "ActionOnly",
+                url: "{controller}/{action}",
+                defaults: new { controller = "Home", action = "Index" }
             );
         }
     }

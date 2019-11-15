@@ -12,7 +12,7 @@ namespace BlogFall.Controllers
     public class HomeController : BaseController
     {
 
-        public ActionResult Index(int? cid, int page = 1)
+        public ActionResult Index(int? cid, string slug, int page = 1)
         {
             int pageSize = 5;
 
@@ -25,9 +25,15 @@ namespace BlogFall.Controllers
             if (cid != null)
             {
                 cat = db.Categories.Find(cid);
+
                 if (cat == null)
                 {
                     return HttpNotFound();
+                }
+
+                if (cat.Slug!=slug)
+                {
+                    return RedirectToRoute("CategoryRoute", new { cid = cid, slug = cat.Slug, page = page });//page=page => page
                 }
                 ViewBag.SubTitle = cat.CategoryName;
                 result = result.Where(x => x.CategoryId == cid);//Filtrelediğimizi yolladık.
@@ -65,12 +71,17 @@ namespace BlogFall.Controllers
             return PartialView("_CategoriesPartial", db.Categories.ToList());//
         }
 
-        public ActionResult ShowPost(int id)
+        public ActionResult ShowPost(int id, string slug)
         {
             Post post = db.Posts.Find(id);
-            if (post==null)
+            if (post == null)
             {
                 return HttpNotFound();
+            }
+            //eğer adresteki slug veritabanı ile aynı değilse
+            if (post.Slug != slug)
+            {
+                return RedirectToRoute("PostRoute", new { id = id, slug = post.Slug });
             }
 
             return View(post);
@@ -84,12 +95,12 @@ namespace BlogFall.Controllers
                 Comment comment = new Comment
                 {
                     AuthorId = User.Identity.GetUserId(),
-                    AuthorName=model.AuthorName,
-                    AuthorEmail= model.AuthorEmail,
-                    Content=model.Content,
-                    CreationTime=DateTime.Now,
-                    ParentId=model.ParentId,
-                    PostId=model.PostId
+                    AuthorName = model.AuthorName,
+                    AuthorEmail = model.AuthorEmail,
+                    Content = model.Content,
+                    CreationTime = DateTime.Now,
+                    ParentId = model.ParentId,
+                    PostId = model.PostId
                 };
                 db.Comments.Add(comment);
                 db.SaveChanges();
@@ -100,7 +111,7 @@ namespace BlogFall.Controllers
                 .Select(e => e.ErrorMessage)
                 .ToList();
 
-            return Json(new { Errors=errorList});
+            return Json(new { Errors = errorList });
         }
     }
 }
