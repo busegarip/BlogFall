@@ -31,7 +31,7 @@
                         <td>@item.Title</td>
                         <td>@item.Category.CategoryName</td>
                         <td>@item.Author.UserName</td>
-                        <td>@item.CreationTime</td>
+                        <td data-sort="@item.CreationTime.Value.ToString("o")">@item.CreationTime</td>
                         <td>
                             <a href="@Url.Action("Edit", "Posts", new { id = item.Id})" class="btn btn-info">
                                 Düzenle
@@ -85,10 +85,14 @@
     <script>
     $(function () {
         var table = $("#example1").DataTable({
-            order:[[4,"desc"]],
+            order: [[4, "desc"]],
             language: {
                 url: "@Url.Content("~/Areas/Admin/plugins/datatables/Turkish.json")" /*layouta sürükleyerek kullanılmıyormuş bu yüzden bu şekilde kullandık türkçeleştirdik*/
-            }
+            },
+            columnDefs: [
+                { "type": "num", "targets": 0 },
+                { type: 'turkish', targets: '_all' }
+            ]
         });
 
         //sil modalı gözükürken tetiklenen event
@@ -117,7 +121,7 @@
             });
         });
 
-    });
+        });
     </script>
 }
 
